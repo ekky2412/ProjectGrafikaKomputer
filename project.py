@@ -47,7 +47,7 @@ class Paint(object):
     def use_kotak(self):
         #(x1,y1,x2,y2)
         self.c.delete("all")
-        self.c.create_rectangle(10,10,110,80,fill=self.DEFAULT_COLOR,width=2)
+        self.c.create_rectangle(10,10,80,80,fill=self.DEFAULT_COLOR,width=2)
 
     def use_segitiga(self):
         #(x1,y1,x2,y2,x3,y3)
