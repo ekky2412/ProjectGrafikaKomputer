@@ -12,7 +12,7 @@ class Paint(object):
     WIDTH = 600
     HEIGHT = 600
     center = [WIDTH/2,HEIGHT/2]
-    DEFAULT_COLOR = 'black'
+    DEFAULT_COLOR = 'white'
     DEFAULT_COLOR_OUTLINE = 'black'
     CLICKED_BUTTON = ''
     titik = []
@@ -21,9 +21,9 @@ class Paint(object):
     def __init__(self):
         self.root = Tk()
         
-        icon_oval = PhotoImage(file = "D:\KULIAH\Grafika Komputer\Project Akhir\images\oval.png")
-        icon_kotak = PhotoImage(file = "D:\KULIAH\Grafika Komputer\Project Akhir\images\persegi.png")
-        icon_segitiga = PhotoImage(file = "D:\KULIAH\Grafika Komputer\Project Akhir\images\segitiga.png")
+        icon_oval = PhotoImage(file = "D:\RS KULIAH\SEMESTER 6\GRAFKOM\ProjectGrafikaKomputer\images\oval.png")
+        icon_kotak = PhotoImage(file = "D:\RS KULIAH\SEMESTER 6\GRAFKOM\ProjectGrafikaKomputer\images\persegi.png")
+        icon_segitiga = PhotoImage(file = "D:\RS KULIAH\SEMESTER 6\GRAFKOM\ProjectGrafikaKomputer\images\segitiga.png")
 
         icon_oval = icon_oval.subsample(3,3)
         icon_kotak = icon_kotak.subsample(3,3)
