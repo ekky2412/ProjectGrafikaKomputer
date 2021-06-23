@@ -12,7 +12,7 @@ class Paint(object):
     WIDTH = 600
     HEIGHT = 600
     center = [WIDTH/2,HEIGHT/2]
-    DEFAULT_COLOR = 'white'
+    DEFAULT_COLOR = 'black'
     DEFAULT_COLOR_OUTLINE = 'black'
     CLICKED_BUTTON = ''
     titik = []
@@ -21,9 +21,9 @@ class Paint(object):
     def __init__(self):
         self.root = Tk()
         
-        icon_oval = PhotoImage(file = "D:\RS KULIAH\SEMESTER 6\GRAFKOM\ProjectGrafikaKomputer\images\oval.png")
-        icon_kotak = PhotoImage(file = "D:\RS KULIAH\SEMESTER 6\GRAFKOM\ProjectGrafikaKomputer\images\persegi.png")
-        icon_segitiga = PhotoImage(file = "D:\RS KULIAH\SEMESTER 6\GRAFKOM\ProjectGrafikaKomputer\images\segitiga.png")
+        icon_oval = PhotoImage(file = "D:\KULIAH\Grafika Komputer\Project Akhir\images\oval.png")
+        icon_kotak = PhotoImage(file = "D:\KULIAH\Grafika Komputer\Project Akhir\images\persegi.png")
+        icon_segitiga = PhotoImage(file = "D:\KULIAH\Grafika Komputer\Project Akhir\images\segitiga.png")
 
         icon_oval = icon_oval.subsample(3,3)
         icon_kotak = icon_kotak.subsample(3,3)
@@ -74,6 +74,13 @@ class Paint(object):
 
         self.rotasi_value = Spinbox(self.root,width=5,from_=-100,to=100,increment=5)
         self.rotasi_value.grid(column=0,padx=240,row=1,sticky=NE,pady=13)
+
+        #Tombol Scaling
+        self.zoom_value = Scale(self.root,from_=100,to=-100)
+        self.zoom_value.grid(column=1,row=0,sticky=S,pady=40)
+
+        self.zoom_button = Button(self.root,text="Zoom",command=self.zoom)
+        self.zoom_button.grid(column=1,row=0,sticky=S,pady=10)
 
         #Tombol Output Koordinat
         self.print_titik_kotak = Text(self.root, height=10, width=50)
@@ -322,7 +329,18 @@ class Paint(object):
         sudut = math.radians(int(self.rotasi_value.get()))
         cos_val = math.cos(sudut)
         sin_val = math.sin(sudut)
-        cx ,cy = self.center
+
+        tx = 0
+        ty = 0
+        
+        for x in range(len(self.titik)):
+            tx += self.titik[x][0]
+            ty += self.titik[x][1]
+            
+        tx = round(tx/len(self.titik))
+        ty = round(ty/len(self.titik))
+        
+        cx ,cy = tx,ty
         titik = []
 
         for x_lama , y_lama in self.titik:
@@ -338,8 +356,41 @@ class Paint(object):
             self.use_kotak(titik)    
         elif(self.CLICKED_BUTTON == "segitiga"):    
             self.use_segitiga(titik)
-# Scaling shape
 
+# Scaling shape
+    def zoom(self):
+        tx = 0
+        ty = 0
+        
+        for x in range(len(self.titik)):
+            tx += self.titik[x][0]
+            ty += self.titik[x][1]
+            
+        tx = round(tx/len(self.titik))
+        ty = round(ty/len(self.titik))
+
+        titik = []
+
+        ukuran_perbesar = (self.zoom_value.get()/100) + 1
+
+        for x_lama , y_lama in self.titik:
+            x_lama -= tx
+            y_lama -= ty
+
+            x_baru = ukuran_perbesar * x_lama
+            y_baru = ukuran_perbesar * y_lama
+
+            x_baru += tx
+            y_baru += ty
+
+            titik.append([x_baru, y_baru])
+
+        if(self.CLICKED_BUTTON == "oval"):
+            self.use_oval(titik)
+        elif(self.CLICKED_BUTTON == "kotak"):
+            self.use_kotak(titik)    
+        elif(self.CLICKED_BUTTON == "segitiga"):    
+            self.use_segitiga(titik)    
 
 if __name__ == '__main__':
     Paint()
