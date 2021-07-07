@@ -5,16 +5,17 @@ from tkinter import colorchooser
 from tkinter.colorchooser import askcolor
 from tkinter.ttk import Style
 
-from numpy.lib.function_base import append
+from numpy.lib.function_base import append, flip
 
 class Paint(object):
 
-    WIDTH = 600
+    WIDTH = 1200
     HEIGHT = 600
     center = [WIDTH/2,HEIGHT/2]
     x = y = 0
     DEFAULT_COLOR = 'black'
     DEFAULT_COLOR_OUTLINE = 'black'
+    DEFAULT_WIDTH_OUTLINE = '1'
     CLICKED_BUTTON = ''
     titik = []
     pilihan_tipe = ["default","dash","dash dot","dash dot dot"]
@@ -50,6 +51,8 @@ class Paint(object):
         icon_zoom = PhotoImage(file = "D:\KULIAH\Grafika Komputer\Project Akhir\images\magnifier.png")
         icon_rotate = PhotoImage(file = "D:\KULIAH\Grafika Komputer\Project Akhir\images\\rotate.png")
         icon_pen = PhotoImage(file = "D:\KULIAH\Grafika Komputer\Project Akhir\images\pen.png")
+        icon_skew_x = PhotoImage(file = "D:\KULIAH\Grafika Komputer\Project Akhir\images\skew_x.png")
+        icon_skew_y = PhotoImage(file = "D:\KULIAH\Grafika Komputer\Project Akhir\images\skew_y.png")
 
         icon_oval = icon_oval.subsample(3,3)
         icon_kotak = icon_kotak.subsample(3,3)
@@ -69,84 +72,105 @@ class Paint(object):
         icon_zoom = icon_zoom.subsample(4,4)
         icon_rotate = icon_rotate.subsample(4,4)
         icon_pen = icon_pen.subsample(4,4)
+        icon_skew_x = icon_skew_x.subsample(4,4)
+        icon_skew_y = icon_skew_y.subsample(4,4)
 
         
-        #setting ukuran canvas sebesar 600px x 600px
+        #setting ukuran canvas sebesar width x height
         self.c = Canvas(self.root,bg='white',width=self.WIDTH,height=self.HEIGHT)
-        self.c.grid(row=0)
+        self.c.grid(row=0,column=0,pady=300)
 
         #Tombol Shape
         self.oval_button = Button(self.root, text="Oval", image=icon_oval ,command=self.use_oval, compound=LEFT)
-        self.oval_button.grid(row=1,column=0,sticky=NW,padx=30)
+        self.oval_button.grid(row=0,column=0,sticky=NW,padx=30,pady=20)
         
         self.kotak_button = Button(self.root, text="Persegi", image=icon_kotak, command=self.use_kotak, compound=LEFT)
-        self.kotak_button.grid(row=1,column=0,sticky=W,padx=30)
+        self.kotak_button.grid(row=0,column=0,sticky=NW,padx=30,pady=70)
 
         self.segitiga_button = Button(self.root, text="Segitiga", image=icon_segitiga, command=self.use_segitiga, compound=LEFT)
-        self.segitiga_button.grid(row=1,column=0,sticky=SW,padx=30)
+        self.segitiga_button.grid(row=0,column=0,sticky=NW,padx=30,pady=120)
 
         self.ketupat_button = Button(self.root, text="Belah Ketupat", image=icon_ketupat, command=self.use_ketupat,compound=LEFT)
-        self.ketupat_button.grid(row=1,column=0,sticky=NW,padx=30,pady=50)
+        self.ketupat_button.grid(row=0,column=0,sticky=NW,padx=30,pady=170)
 
         self.segilima_button = Button(self.root, text="Segilima", image=icon_segilima, command=self.use_segilima,compound=LEFT)
-        self.segilima_button.grid(row=1,column=0,sticky=SW,padx=30,pady=50)
+        self.segilima_button.grid(row=0,column=0,sticky=NW,padx=30,pady=220)
 
         #Tombol Pen
         self.pen_button = Button(self.root, text="Pen", command=self.use_pen_first, image=icon_pen, compound=LEFT)
-        self.pen_button.grid(row=0,column=1,sticky=NW,padx=30,pady=10)
+        self.pen_button.grid(row=0,column=0,sticky=NW,padx=180,pady=20)
 
         self.tipe_dash_value = StringVar(self.root)
         self.tipe_dash_value.set(self.pilihan_tipe[0])
 
         self.pilihan_dash_button = OptionMenu(self.root,self.tipe_dash_value,*self.pilihan_tipe,command=self.tipe_dash_function)
-        self.pilihan_dash_button.grid(row=0,column=1,sticky=NW,padx=30,pady=45)
+        self.pilihan_dash_button.grid(row=0,column=0,sticky=NW,padx=180,pady=60)
 
         #Tombol Warna
         self.pick_color_button = Button(self.root, text="Warna Fill",command=self.pick_color)
-        self.pick_color_button.grid(row=0,column=1,sticky=N,padx=30)
+        self.pick_color_button.grid(row=0,column=0,sticky=NW,padx=310,pady=20)
         
         self.pick_color_hasil = Button(self.root,background=self.DEFAULT_COLOR)
-        self.pick_color_hasil.grid(row=0,column=1,sticky=N,pady=30,ipadx=10)
+        self.pick_color_hasil.grid(row=0,column=0,sticky=NW,padx=320,pady=50)
+        self.pick_color_hasil.config(width=5)
 
         self.pick_color_outline_button = Button(self.root,text="Warna Outline",command=self.pick_color_outline)
-        self.pick_color_outline_button.grid(row=0,column=1,sticky=N,padx=50,pady=60)
+        self.pick_color_outline_button.grid(row=0,column=0,sticky=NW,padx=300,pady=80)
 
         self.pick_color_outline_hasil = Button(self.root,background=self.DEFAULT_COLOR)
-        self.pick_color_outline_hasil.grid(row=0,column=1,sticky=N,pady=90,ipadx=10)
+        self.pick_color_outline_hasil.grid(row=0,column=0,sticky=NW,padx=320,pady=120)
+        self.pick_color_outline_hasil.config(width=5)
         
         #Tombol Translasi
         self.arah_button = StringVar(self.root)
         self.arah_button.set(self.arah_translasi[0])
 
         self.arah_isi = OptionMenu(self.root,self.arah_button,*self.arah_translasi,command=self.ganti_icon_panah)
-        self.arah_isi.grid(row=0,column=1,sticky=W,padx=100)
+        self.arah_isi.grid(row=0,column=0,sticky=N,padx=100,pady=20)
 
         self.arah_value = Spinbox(self.root,width=5,from_=0,to=100,increment=5)
-        self.arah_value.grid(column=1,padx=140,row=0,sticky=E)
+        self.arah_value.grid(column=0,row=0,sticky=N,pady=55)
 
         self.arah_submit = Button(self.root, text="Apply",command=self.translasi)
-        self.arah_submit.grid(column=1,row=0,pady=250,sticky=S)
+        self.arah_submit.grid(column=0,row=0,pady=80,sticky=N)
 
         self.arah_icon = Button(self.root, image=self.icon_arrow_left_up,border=0)
-        self.arah_icon.grid(column=1,row=0,padx=70,sticky=W)
+        self.arah_icon.grid(column=0,row=0,padx=550,pady=25,sticky=NW)
 
         #Tombol Rotasi
         self.rotasi_button = Button(self.root, text="Rotate",command=self.rotasi, image=icon_rotate, compound=LEFT)
-        self.rotasi_button.grid(column=0,row=1,sticky=NE,padx=300,pady=10)
+        self.rotasi_button.grid(column=0,row=0,sticky=NW,padx=300,pady=195)
 
         self.rotasi_value = Spinbox(self.root,width=5,from_=-100,to=100,increment=5)
-        self.rotasi_value.grid(column=0,padx=240,row=1,sticky=NE,pady=13)
+        self.rotasi_value.grid(column=0,padx=310,row=0,sticky=NW,pady=170)
 
         #Tombol Scaling
         self.zoom_value = Scale(self.root,from_=100,to=-100)
-        self.zoom_value.grid(column=1,row=0,sticky=S,pady=40)
+        self.zoom_value.grid(column=0,row=0,sticky=NW,pady=140,padx=400)
 
         self.zoom_button = Button(self.root,text="Zoom",command=self.zoom,image=icon_zoom, compound=LEFT)
-        self.zoom_button.grid(column=1,row=0,sticky=S,pady=10)
+        self.zoom_button.grid(column=0,row=0,sticky=NW,pady=250,padx=400)
+
+        #Tombol Skew
+        self.skew_value = Scale(self.root,from_=100,to=-100)
+        self.skew_value.grid(column=0,row=0,sticky=NW,pady=140,padx=500)
+
+        self.skew_button_x = Button(self.root, text="Skew X",command=self.skew_x,image=icon_skew_x,compound=LEFT)
+        self.skew_button_x.grid(column=0,row=0,sticky=NW,pady=250,padx=480)
+
+        self.skew_button_y = Button(self.root, text="Skew Y",command=self.skew_y,image=icon_skew_y,compound=LEFT)
+        self.skew_button_y.grid(column=0,row=0,sticky=NW,pady=240,padx=590)
 
         #Tombol Output Koordinat
         self.print_titik_kotak = Text(self.root, height=15, width=50)
-        self.print_titik_kotak.grid(row=1,column=1)
+        self.print_titik_kotak.grid(row=0,column=0,sticky=NE)
+
+        #Tombol Ukuran Outline
+        self.ukuran_width = Scale(self.root,from_=10,to=1)
+        self.ukuran_width.grid(row=0,column=0,sticky=NW,pady=100,padx=180)
+
+        self.tombol_ukuran = Button(self.root, text="Ketebalan",command=self.func_ukuran_width)
+        self.tombol_ukuran.grid(row=0,column=0,sticky=NW,pady=210,padx=180)
 
         #Binding klik kiri ke canvas
         self.c.bind("<ButtonPress-1>", self.on_button_press)
@@ -178,6 +202,10 @@ class Paint(object):
             self.use_kotak(titik)    
         elif(self.CLICKED_BUTTON == "segitiga"):    
             self.use_segitiga(titik)
+        elif(self.CLICKED_BUTTON == "belah ketupat"):    
+            self.use_ketupat(titik)
+        elif(self.CLICKED_BUTTON == "segilima"):    
+            self.use_segilima(titik)
         elif(self.CLICKED_BUTTON == "pen"):
             self.use_pen(titik)
         self.titik = titik
@@ -193,7 +221,7 @@ class Paint(object):
             self.titik = [[200,200],[400,400]]
         else:
             self.titik = titik
-        self.c.create_oval(self.titik,fill= self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE,width=2)
+        self.c.create_oval(self.titik,fill= self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE,width=self.DEFAULT_WIDTH_OUTLINE)
         self.CLICKED_BUTTON = "oval"
         self.print_titik()
 
@@ -205,7 +233,8 @@ class Paint(object):
             self.titik = [[200,200],[200,400],[400,400],[400,200]]
         else:
             self.titik = titik
-        self.c.create_polygon(self.titik,fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE,width=2)
+        self.c.create_polygon(self.titik,fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE,width=self.DEFAULT_WIDTH_OUTLINE)
+        print(self.DEFAULT_WIDTH_OUTLINE)
         self.CLICKED_BUTTON = "kotak"
         self.print_titik()
 
@@ -220,7 +249,7 @@ class Paint(object):
             self.titik = [[200,400],[400,400],[300,200]]
         else:
             self.titik = titik
-        self.c.create_polygon(self.titik, fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE)
+        self.c.create_polygon(self.titik, fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE,width=self.DEFAULT_WIDTH_OUTLINE)
         self.CLICKED_BUTTON = "segitiga"
         self.print_titik()
 
@@ -231,7 +260,7 @@ class Paint(object):
             self.titik = [[200,300],[300,200],[400,300],[300,400]]
         else:
             self.titik = titik
-        self.c.create_polygon(self.titik, fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE)
+        self.c.create_polygon(self.titik, fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE,width=self.DEFAULT_WIDTH_OUTLINE)
         self.CLICKED_BUTTON = "belah ketupat"
         self.print_titik()
 
@@ -243,7 +272,7 @@ class Paint(object):
             self.titik = [[150,300],[300,180],[450,300],[380,450],[220,450]]
         else:
             self.titik = titik
-        self.c.create_polygon(self.titik, fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE)
+        self.c.create_polygon(self.titik, fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE,width=self.DEFAULT_WIDTH_OUTLINE)
         self.CLICKED_BUTTON = "segilima"
         self.print_titik()
 
@@ -257,7 +286,7 @@ class Paint(object):
         if(self.tipe_dipilih == "default"):
             self.c.create_line(titik,fill=self.DEFAULT_COLOR_OUTLINE)
         else:
-            self.c.create_line(titik, dash=self.tipe_dash[self.tipe_dipilih],fill=self.DEFAULT_COLOR_OUTLINE)
+            self.c.create_line(titik, dash=self.tipe_dash[self.tipe_dipilih],fill=self.DEFAULT_COLOR_OUTLINE,width=self.DEFAULT_WIDTH_OUTLINE)
         self.print_titik()
         
 # Untuk memilih warna
@@ -273,14 +302,21 @@ class Paint(object):
     def tipe_dash_function(self,arah = "default"):
         self.tipe_dipilih = arah
 
+# Memilih tipe ukuran outline
+    def func_ukuran_width(self):
+        self.DEFAULT_WIDTH_OUTLINE = self.ukuran_width.get()
+        self.onCLick(self.titik)
+        
+
 # Untuk menyimpan button apa yang telah ditekan antara bangun datar
     def onCLick(self,titik):
         if self.CLICKED_BUTTON == 'oval':
-            self.c.create_oval(titik,fill= self.DEFAULT_COLOR,width=2,outline=self.DEFAULT_COLOR_OUTLINE)
+            self.c.create_oval(titik,fill= self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE,width=self.DEFAULT_WIDTH_OUTLINE)
         elif self.CLICKED_BUTTON == 'kotak':
-            self.c.create_polygon(titik,fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE,width=2)
+            self.c.create_polygon(titik,fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE,width=self.DEFAULT_WIDTH_OUTLINE)
+            print(self.DEFAULT_WIDTH_OUTLINE)
         elif (self.CLICKED_BUTTON == 'segitiga' or self.CLICKED_BUTTON == 'belah ketupat' or self.CLICKED_BUTTON == 'segilima'):
-            self.c.create_polygon(titik, fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE)
+            self.c.create_polygon(titik, fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE,width=self.DEFAULT_WIDTH_OUTLINE)
         # elif self.CLICKED_BUTTON == 'belah ketupat':
         #     self.c.create_polygon(titik, fill=self.DEFAULT_COLOR,outline=self.DEFAULT_COLOR_OUTLINE)
         # elif self.CLICKED_BUTTON == 'segilima':
@@ -509,6 +545,43 @@ class Paint(object):
             self.use_segilima(titik)
         elif(self.CLICKED_BUTTON == "pen"):
             self.use_pen(titik)    
+
+# Skew Shape
+    def skew_x(self):
+        titik = []
+        for xlama,ylama in self.titik:
+            xbaru = xlama + (self.skew_value.get()/100) * ylama
+            ybaru = ylama
+            titik.append([xbaru,ybaru])
+        
+        if(self.CLICKED_BUTTON == "oval"):
+            self.use_oval(titik)
+        elif(self.CLICKED_BUTTON == "kotak"):
+            self.use_kotak(titik)    
+        elif(self.CLICKED_BUTTON == "segitiga"):    
+            self.use_segitiga(titik)
+        elif(self.CLICKED_BUTTON == "belah ketupat"):    
+            self.use_ketupat(titik)
+        elif(self.CLICKED_BUTTON == "segilima"):    
+            self.use_segilima(titik)
+    
+    def skew_y(self):
+        titik = []
+        for xlama,ylama in self.titik:
+            xbaru = xlama
+            ybaru = ylama + (-self.skew_value.get()/100) * xlama
+            titik.append([xbaru,ybaru])
+        
+        if(self.CLICKED_BUTTON == "oval"):
+            self.use_oval(titik)
+        elif(self.CLICKED_BUTTON == "kotak"):
+            self.use_kotak(titik)    
+        elif(self.CLICKED_BUTTON == "segitiga"):    
+            self.use_segitiga(titik)
+        elif(self.CLICKED_BUTTON == "belah ketupat"):    
+            self.use_ketupat(titik)
+        elif(self.CLICKED_BUTTON == "segilima"):    
+            self.use_segilima(titik)
 
 if __name__ == '__main__':
     Paint()
